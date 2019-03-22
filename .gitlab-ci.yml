@@ -1,0 +1,28 @@
+image: ubuntu:18.04
+
+.install-racket:
+  before_script:
+    - echo $TZ > /etc/timezone
+    - apt-get update && apt-get install -y curl git make wget sqlite3 ca-certificates libssl-dev libglib2.0-dev libfontconfig1-dev libcairo2-dev libpango1.0-dev libjpeg-turbo8-dev software-properties-common openjdk-11-jre-headless texlive texlive-latex-extra texlive-fonts-extra
+    - git clone https://github.com/greghendershott/travis-racket.git /tmp/travis-racket
+    - cat /tmp/travis-racket/install-racket.sh | bash
+    - export PATH="${RACKET_DIR}/bin:${PATH}"
+    - ${RACKET_DIR}/bin/racket --version
+    - raco pkg install --auto scribble-abbrevs
+
+build:pdf:racket:
+  extends: .install-racket
+  variables:
+    RACKET_VERSION: "HEAD"
+    RACKET_DIR: "./racket"
+    DEBIAN_FRONTEND: "noninteractive"
+    DEBCONF_NONINTERACTIVE_SEEN: "true"
+    TZ: "Europe/Berlin"
+  script:
+    - scribble --pdf ++xref-in setup/xref load-collections-xref --redirect-main "http://pre.plt-scheme.org/docs/html/" handouts.scrbl
+  artifacts:
+    name: handouts-pdf
+    paths:
+      - handouts.pdf
+
+

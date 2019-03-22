@@ -1,0 +1,8 @@
+# Temps
+*~
+
+# Compiled
+compiled/
+
+# Generated ppms
+*.ppm
